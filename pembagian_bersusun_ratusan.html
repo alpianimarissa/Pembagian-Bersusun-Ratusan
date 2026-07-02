@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Juara Pembagian Bersusun - Badminton Math</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdfa; /* Light mint arena */
+            background-image: radial-gradient(#14b8a6 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-kids {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom slide transitions */
+        .slide-hidden {
+            display: none !important;
+        }
+        .slide-active {
+            display: flex !important;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+        }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.97) translateY(12px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0fdfa;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14b8a6;
+            border-radius: 10px;
+        }
+        /* Porogapit writing board styling (Light theme whiteboard) */
+        .porogapit-board {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8fafc;
+            color: #0f172a;
+            border: 3px solid #0d9488;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
+
+    <!-- Header Panel -->
+    <header class="bg-teal-600 text-white p-3 sticky top-0 z-50 flex items-center justify-between px-6 shadow-md border-b-4 border-teal-800">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl animate-bounce"><i class="fa-solid fa-book-open text-yellow-300"></i></span>
+            <div>
+                <h1 class="text-sm md:text-md font-bold font-kids tracking-wider leading-none">TAKTIK SMASH RATUSAN</h1>
+                <span class="text-[10px] font-mono tracking-widest text-teal-100 uppercase">Materi Porogapit &bull; Kelas 3 SD</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="bg-teal-700 border border-teal-800 px-3 py-1 rounded-full text-xs font-bold font-kids text-teal-100 shadow-md">
+                📖 Mode Belajar
+            </div>
+            <button onclick="toggleSidebar()" class="lg:hidden bg-teal-700 text-teal-100 p-2 rounded-xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow flex relative overflow-hidden">
+        
+        <!-- Sidebar Roadmap Menu -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col w-64 bg-white border-r border-teal-100 p-4 transition-transform duration-300 ease-in-out z-30 shadow-lg lg:shadow-none h-full">
+            <div class="flex items-center justify-between mb-4 lg:hidden">
+                <span class="font-bold text-teal-900 font-kids">Peta Materi</span>
+                <button onclick="toggleSidebar()" class="text-teal-700 hover:text-teal-900"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <h3 class="text-[10px] uppercase tracking-wider font-semibold text-teal-600 mb-3 px-2 font-mono">Daftar Bab Belajar</h3>
+            <div class="flex-grow overflow-y-auto space-y-1.5 pr-1" id="slide-menu">
+                <!-- Dynamic Sidebar Menu -->
+            </div>
+        </aside>
+
+        <!-- Slide Presentation Window -->
+        <section class="flex-grow flex flex-col items-center justify-start p-3 md:p-6 overflow-y-auto h-[calc(100vh-56px)] w-full">
+            <div id="deck-canvas" class="w-full max-w-4xl bg-white border-4 border-teal-400 rounded-3xl shadow-xl flex flex-col justify-between overflow-y-auto lg:overflow-hidden relative min-h-[550px]">
+                
+                <!-- Dynamic Slide Loader -->
+                <div class="flex-grow flex flex-col p-5 md:p-8 justify-center relative" id="slide-wrapper">
+                    
+                    <!-- SLIDE 1: INTRO -->
+                    <div class="slide-active flex-col h-full gap-4 justify-between" id="slide-1">
+                        <div class="text-center max-w-2xl mx-auto space-y-3">
+                            <span class="bg-teal-100 text-teal-800 border border-teal-200 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wider uppercase">🏸 Misi Smash Matematika</span>
+                            <h2 class="text-3xl md:text-5xl font-black text-teal-950 leading-tight font-kids">Juara Pembagian Bersusun (Porogapit)</h2>
+                            <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                                Halo Sobat Bulutangkis! Setelah sukses meluncurkan smash keras di latihan perkalian bersusun, kini saatnya kita membagi rata pasokan ratusan *shuttlecock* dan medali tanding ganda campuran dengan metode Porogapit!
+                            </p>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto w-full my-auto font-kids">
+                            <div class="bg-teal-50 border border-teal-150 p-4 rounded-2xl flex items-center gap-4">
+                                <div class="text-4xl">🏸</div>
+                                <div>
+                                    <h4 class="font-bold text-teal-900 text-sm">Porogapit Court</h4>
+                                    <p class="text-xs text-slate-500 font-normal leading-normal">Membagi ratusan shuttlecock ke masing-masing keranjang secara adil.</p>
+                                </div>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-150 p-4 rounded-2xl flex items-center gap-4">
+                                <div class="text-4xl">⚡</div>
+                                <div>
+                                    <h4 class="font-bold text-teal-900 text-sm">Pemahaman Visual</h4>
+                                    <p class="text-xs text-slate-500 font-normal leading-normal">Mengasah pemahaman materi porogapit ratusan langkah demi langkah.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 2: TUJUAN -->
+                    <div class="slide-hidden flex-col h-full gap-4 justify-between" id="slide-2">
+                        <h2 class="text-xl md:text-2xl font-bold text-teal-800 border-l-4 border-teal-500 pl-3 font-kids">Target Belajar Hari Ini 🎯</h2>
+                        <div class="grid md:grid-cols-3 gap-4 my-auto">
+                            <div class="bg-teal-50/50 border border-teal-100 p-5 rounded-2xl flex flex-col justify-between h-48 shadow-sm">
+                                <div>
+                                    <span class="text-teal-600 font-mono text-xs font-bold">TARGET #1</span>
+                                    <h4 class="font-bold text-slate-900 text-md font-kids mt-1">Hubungan Operasi</h4>
+                                    <p class="text-slate-500 text-xs mt-2 leading-relaxed">Memahami hubungan pembagian ratusan sebagai kebalikan dari taktik perkalian bersusun.</p>
+                                </div>
+                                <span class="text-[10px] text-teal-700 font-bold tracking-wider font-mono">100% KUASAI</span>
+                            </div>
+                            <div class="bg-teal-50/50 border border-teal-100 p-5 rounded-2xl flex flex-col justify-between h-48 shadow-sm">
+                                <div>
+                                    <span class="text-teal-600 font-mono text-xs font-bold">TARGET #2</span>
+                                    <h4 class="font-bold text-slate-900 text-md font-kids mt-1">Metode Porogapit</h4>
+                                    <p class="text-slate-500 text-xs mt-2 leading-relaxed">Mahir membagi angka ratusan dengan metode porogapit langkah demi langkah secara mandiri.</p>
+                                </div>
+                                <span class="text-[10px] text-teal-700 font-bold tracking-wider font-mono">100% MAHIR</span>
+                            </div>
+                            <div class="bg-teal-50/50 border border-teal-100 p-5 rounded-2xl flex flex-col justify-between h-48 shadow-sm">
+                                <div>
+                                    <span class="text-teal-600 font-mono text-xs font-bold">TARGET #3</span>
+                                    <h4 class="font-bold text-slate-900 text-md font-kids mt-1">Studi Kasus Ratusan</h4>
+                                    <p class="text-slate-500 text-xs mt-2 leading-relaxed">Mampu memecahkan masalah pembagian logistik tim bulutangkis ratusan butir kok.</p>
+                                </div>
+                                <span class="text-[10px] text-teal-700 font-bold tracking-wider font-mono">100% PEMECAHAN</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: WARM UP -->
+                    <div class="slide-hidden flex-col h-full gap-3" id="slide-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-teal-800 border-l-4 border-teal-500 pl-3 font-kids">Pemanasan Otot (Warm-Up) 🏃‍♂️</h2>
+                        <p class="text-xs text-slate-500">Pembagian adalah kebalikan dari perkalian. Ayo uji ingatan raket angkamu! Klik setiap kartu untuk menyingkap rahasianya.</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-auto">
+                            <!-- Card 1 -->
+                            <button onclick="revealWarmup(1)" id="warmup-card-1" class="bg-white border-2 border-slate-100 p-4 rounded-2xl flex flex-col justify-center items-center text-center transition duration-300 min-h-[120px] hover:border-teal-500 shadow-sm group">
+                                <span class="text-xs font-bold text-teal-600 font-mono">KOK 1</span>
+                                <div class="font-black text-slate-800 text-lg mt-2 group-hover:scale-105 transition" id="wu-text-1">2 &times; 30 = ...</div>
+                            </button>
+                            <!-- Card 2 -->
+                            <button onclick="revealWarmup(2)" id="warmup-card-2" class="bg-white border-2 border-slate-100 p-4 rounded-2xl flex flex-col justify-center items-center text-center transition duration-300 min-h-[120px] hover:border-teal-500 shadow-sm group">
+                                <span class="text-xs font-bold text-teal-600 font-mono">KOK 2</span>
+                                <div class="font-black text-slate-800 text-lg mt-2 group-hover:scale-105 transition" id="wu-text-2">3 &times; 40 = ...</div>
+                            </button>
+                            <!-- Card 3 -->
+                            <button onclick="revealWarmup(3)" id="warmup-card-3" class="bg-white border-2 border-slate-100 p-4 rounded-2xl flex flex-col justify-center items-center text-center transition duration-300 min-h-[120px] hover:border-teal-500 shadow-sm group">
+                                <span class="text-xs font-bold text-teal-600 font-mono">KOK 3</span>
+                                <div class="font-black text-slate-800 text-lg mt-2 group-hover:scale-105 transition" id="wu-text-3">4 &times; 50 = ...</div>
+                            </button>
+                            <!-- Card 4 -->
+                            <button onclick="revealWarmup(4)" id="warmup-card-4" class="bg-white border-2 border-slate-100 p-4 rounded-2xl flex flex-col justify-center items-center text-center transition duration-300 min-h-[120px] hover:border-teal-500 shadow-sm group">
+                                <span class="text-xs font-bold text-teal-600 font-mono">KOK 4</span>
+                                <div class="font-black text-slate-800 text-lg mt-2 group-hover:scale-105 transition" id="wu-text-4">5 &times; 60 = ...</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 4: REAL-WORLD CONNECTION -->
+                    <div class="slide-hidden flex-col h-full gap-4 justify-between" id="slide-4">
+                        <h2 class="text-xl md:text-2xl font-bold text-teal-800 border-l-4 border-teal-500 pl-3 font-kids">Koneksi Nyata di Lapangan Bulutangkis 🏸</h2>
+                        <div class="grid md:grid-cols-3 gap-4 my-auto">
+                            <div class="bg-teal-50 border border-teal-150 p-4 rounded-2xl flex flex-col justify-between shadow-sm min-h-[220px]">
+                                <div>
+                                    <div class="text-3xl mb-2">📦</div>
+                                    <h4 class="font-bold text-teal-950 text-sm font-kids">1. Membagi Tabung Kok</h4>
+                                    <p class="text-slate-600 text-xs mt-1 leading-normal">
+                                        Sebanyak 120 butir shuttlecock dipak ke dalam beberapa tabung. Setiap tabung menampung tepat 6 butir kok. Berapa tabung yang dibutuhkan?
+                                    </p>
+                                </div>
+                                <span class="bg-teal-100 text-teal-800 text-center text-[10px] font-mono font-bold py-1 rounded border border-teal-200">120 &divide; 6 = 20 Tabung</span>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-150 p-4 rounded-2xl flex flex-col justify-between shadow-sm min-h-[220px]">
+                                <div>
+                                    <div class="text-3xl mb-2">👥</div>
+                                    <h4 class="font-bold text-teal-950 text-sm font-kids">2. Pembagian Sesi Turnamen</h4>
+                                    <p class="text-slate-600 text-xs mt-1 leading-normal">
+                                        Ada 160 pemain yang mendaftar turnamen tunggal putra. Jika panitia membagi pertandingan rata di 4 lapangan tanding, berapa pemain di tiap lapangan?
+                                    </p>
+                                </div>
+                                <span class="bg-teal-100 text-teal-800 text-center text-[10px] font-mono font-bold py-1 rounded border border-teal-200">160 &divide; 4 = 40 Pemain</span>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-150 p-4 rounded-2xl flex flex-col justify-between shadow-sm min-h-[220px]">
+                                <div>
+                                    <div class="text-3xl mb-2">🏸</div>
+                                    <h4 class="font-bold text-teal-950 text-sm font-kids">3. Karet Pegangan (Grip)</h4>
+                                    <p class="text-slate-600 text-xs mt-1 leading-normal">
+                                        Sebanyak 150 gulung grip raket warna-warni akan dibagikan rata kepada 3 klub bulutangkis junior. Berapa banyak gulungan grip yang diterima setiap klub?
+                                    </p>
+                                </div>
+                                <span class="bg-teal-100 text-teal-800 text-center text-[10px] font-mono font-bold py-1 rounded border border-teal-200">150 &divide; 3 = 50 Grip</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 5: POROGAPIT VISUALIZER (MATERI INTERAKTIF STEP-BY-STEP) -->
+                    <div class="slide-hidden flex-col h-full gap-4 justify-between" id="slide-5">
+                        <div class="flex flex-wrap items-center justify-between border-b border-teal-100 pb-2">
+                            <h2 class="text-lg md:text-xl font-bold text-teal-800 font-kids">Simulasi Papan Tulis Taktis Porogapit Ratusan 🛠️</h2>
+                            <div class="flex gap-2">
+                                <button onclick="selectVisualization('hundredsA')" id="btn-vis-hundredsA" class="bg-teal-600 text-white font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide">CONTOH 1 (148 &divide; 4)</button>
+                                <button onclick="selectVisualization('hundredsB')" id="btn-vis-hundredsB" class="bg-slate-100 text-slate-500 font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide hover:bg-slate-200">CONTOH 2 (246 &divide; 3)</button>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-12 gap-5 my-auto">
+                            <!-- Visualizer Screen -->
+                            <div class="md:col-span-6 porogapit-board p-6 rounded-2xl font-mono text-center flex flex-col justify-center items-center min-h-[200px] shadow-inner">
+                                <div id="porogapit-lines" class="text-left text-lg md:text-xl leading-relaxed select-text space-y-1">
+                                    <!-- Injected via JS -->
+                                </div>
+                            </div>
+                            <!-- Steps Explanation -->
+                            <div class="md:col-span-6 flex flex-col justify-between min-h-[200px] bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-teal-100 text-teal-800 border border-teal-200 font-bold px-2 py-0.5 rounded text-[10px] uppercase font-mono" id="vis-step-badge">Langkah 1</span>
+                                        <h4 class="text-sm font-bold text-slate-800 font-kids" id="vis-step-title">Membagi Barisan Terdepan</h4>
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed min-h-[60px]" id="vis-step-desc">
+                                        Memulai dengan pembagian baris terdepan pada bilangan yang dibagi...
+                                    </p>
+                                </div>
+                                <div class="flex gap-2 justify-end mt-4">
+                                    <button onclick="prevVisStep()" id="vis-prev-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-[10px] font-kids transition">Mundur</button>
+                                    <button onclick="nextVisStep()" id="vis-next-btn" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-4 py-1.5 rounded-xl text-[10px] font-kids transition">Langkah Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Slide Navigation Footer Control -->
+                <div class="bg-slate-100 border-t border-teal-150 px-6 py-3 flex items-center justify-between z-10 select-none">
+                    <button onclick="prevSlide()" id="prev-btn" class="bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold font-kids transition flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Mundur</button>
+                    <div class="hidden sm:flex items-center gap-1.5" id="slide-bullets"></div>
+                    <button onclick="nextSlide()" id="next-btn" class="bg-gradient-to-tr from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 text-white px-4 py-1.5 rounded-xl text-xs font-bold font-kids transition flex items-center gap-1.5">Maju <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const totalSlides = 5;
+        let currentSlide = 1;
+
+        const slideNames = [
+            "1. Smash Pembagian 🏸",
+            "2. Sasaran Pertandingan 🎯",
+            "3. Pemanasan Raket 🏃‍♂️",
+            "4. Koneksi Bulutangkis 📦",
+            "5. Papan Taktis Porogapit 🛠️"
+        ];
+
+        // Porogapit Step Visualization Configuration - LIGHT EXAMPLES
+        const visualizerData = {
+            hundredsA: {
+                steps: [
+                    { title: "Tulis Struktur Porogapit", lines: ["  ___", "4)148"], desc: "Tulis angka pembagi (4) di luar, dan angka ratusan yang dibagi (148) di dalam." },
+                    { title: "Bagi Dua Angka Depan", lines: ["  3", "  ___", "4)148", "  12", " --- -"], desc: "Karena 1 tidak bisa dibagi 4, kita ambil dua angka depan yaitu 14. 14 dibagi 4 yang mendekati adalah 3. Tulis 3 di atas. 3 dikali 4 adalah 12, tulis di bawah 14." },
+                    { title: "Kurangi & Turunkan", lines: ["  3", "  ___", "4)148", "  12", " --- -", "   28"], desc: "Kurangi 14 dengan 12 hasilnya 2. Lalu turunkan angka satuan terbelakang (8) ke bawah untuk membentuk angka 28." },
+                    { title: "Bagi Hasil Akhir", lines: ["  37", "  ___", "4)148", "  12", " --- -", "   28", "   28", " --- -", "    0"], desc: "Bagi 28 dengan 4 hasilnya adalah 7. Tulis 7 di atas samping angka 3. 7 dikali 4 adalah 28. Kurangi 28 dengan 28 hasilnya 0. Selesai! Hasil akhir = 37." }
+                ]
+            },
+            hundredsB: {
+                steps: [
+                    { title: "Tulis Struktur Porogapit", lines: ["  ___", "3)246"], desc: "Tulis angka pembagi (3) di luar, dan angka ratusan yang dibagi (246) di dalam." },
+                    { title: "Bagi Dua Angka Depan", lines: ["  8", "  ___", "3)246", "  24", " --- -"], desc: "Karena 2 tidak bisa dibagi 3, kita ambil 24. 24 dibagi 3 hasilnya pas 8. Tulis 8 di atas. 8 dikali 3 adalah 24, tulis di bawah 24." },
+                    { title: "Kurangi & Turunkan", lines: ["  8", "  ___", "3)246", "  24", " --- -", "   06"], desc: "Kurangi 24 dengan 24 hasilnya 0. Kemudian turunkan angka satuan terbelakang (6) ke bawah." },
+                    { title: "Bagi Hasil Akhir", lines: ["  82", "  ___", "3)246", "  24", " --- -", "   06", "    6", " --- -", "    0"], desc: "Bagi 6 dengan 3 hasilnya adalah 2. Tulis 2 di atas samping angka 8. 2 dikali 3 adalah 6. Kurangi 6 dengan 6 hasilnya 0. Selesai! Hasil akhir = 82." }
+                ]
+            }
+        };
+
+        let activeVisualizationMode = 'hundredsA';
+        let currentVisStepIndex = 0;
+
+        // Sound Synthesis (Web Audio API)
+        function playQuizSound(type) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(698.46, audioCtx.currentTime + 0.08); // F5
+                    osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.16); // A5
+                } else {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+                }
+                
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (e) {
+                console.log("Audio contexts not loaded.");
+            }
+        }
+
+        // Sidebar Navigation Creation
+        function buildSlideMenu() {
+            const container = document.getElementById('slide-menu');
+            container.innerHTML = "";
+            slideNames.forEach((name, i) => {
+                const idx = i + 1;
+                container.innerHTML += `
+                    <button onclick="goToSlide(${idx})" id="menu-item-${idx}" class="w-full text-left px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center justify-between text-teal-800 hover:bg-teal-50 hover:text-teal-950 transition-all">
+                        <span>${name}</span>
+                        <span class="w-5 h-5 bg-teal-100 text-teal-800 rounded-full flex items-center justify-center font-bold text-[10px]">${idx}</span>
+                    </button>
+                `;
+            });
+        }
+
+        function buildBullets() {
+            const container = document.getElementById('slide-bullets');
+            container.innerHTML = "";
+            for (let i = 1; i <= totalSlides; i++) {
+                container.innerHTML += `
+                    <button onclick="goToSlide(${i})" id="bullet-item-${i}" class="w-3 h-3 rounded-full bg-teal-200 transition-all duration-200"></button>
+                `;
+            }
+        }
+
+        function showSlide(index) {
+            if (index < 1 || index > totalSlides) return;
+
+            for (let i = 1; i <= totalSlides; i++) {
+                const el = document.getElementById(`slide-${i}`);
+                if (el) {
+                    if (i === index) {
+                        el.classList.remove('slide-hidden');
+                        el.classList.add('slide-active');
+                    } else {
+                        el.classList.add('slide-hidden');
+                        el.classList.remove('slide-active');
+                    }
+                }
+
+                const menuEl = document.getElementById(`menu-item-${i}`);
+                if (menuEl) {
+                    if (i === index) {
+                        menuEl.classList.add('bg-teal-100', 'text-teal-950', 'font-black');
+                    } else {
+                        menuEl.classList.remove('bg-teal-100', 'text-teal-950', 'font-black');
+                    }
+                }
+
+                const bulletEl = document.getElementById(`bullet-item-${i}`);
+                if (bulletEl) {
+                    if (i === index) {
+                        bulletEl.classList.add('bg-teal-500', 'w-6');
+                        bulletEl.classList.remove('bg-teal-200');
+                    } else {
+                        bulletEl.classList.remove('bg-teal-500', 'w-6');
+                        bulletEl.classList.add('bg-teal-200');
+                    }
+                }
+            }
+
+            currentSlide = index;
+
+            document.getElementById('prev-btn').disabled = currentSlide === 1;
+            document.getElementById('next-btn').innerHTML = currentSlide === totalSlides ? 'Ulangi Belajar 🔄' : 'Maju <i class="fa-solid fa-arrow-right ml-1"></i>';
+
+            if (currentSlide === 5) {
+                renderVisualization();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+            else showSlide(1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) showSlide(currentSlide - 1);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        // ============================================
+        // Slide 3: Warmup Interactive Handler
+        // ============================================
+        const warmupData = {
+            1: { solved: false, formula: "2 &times; 30 = 60", reverse: "Maka, 60 &divide; 2 = 30 🏸" },
+            2: { solved: false, formula: "3 &times; 40 = 120", reverse: "Maka, 120 &divide; 3 = 40 🏸" },
+            3: { solved: false, formula: "4 &times; 50 = 200", reverse: "Maka, 200 &divide; 4 = 50 🏸" },
+            4: { solved: false, formula: "5 &times; 60 = 300", reverse: "Maka, 300 &divide; 5 = 60 🏸" }
+        };
+
+        function revealWarmup(id) {
+            const data = warmupData[id];
+            if (data.solved) return;
+            data.solved = true;
+
+            const card = document.getElementById(`warmup-card-${id}`);
+            const text = document.getElementById(`wu-text-${id}`);
+
+            card.className = "bg-teal-50 border-2 border-teal-300 p-4 rounded-2xl flex flex-col justify-center items-center text-center transition duration-300 min-h-[120px] shadow-md shadow-teal-500/10";
+            text.innerHTML = `<span class="text-sm font-bold text-teal-850 font-kids">${data.formula}</span><br><span class="text-[11px] text-teal-600 font-semibold mt-1 block font-kids">${data.reverse}</span>`;
+            playQuizSound('correct');
+        }
+
+        // ============================================
+        // Slide 5: Porogapit Visualizer Engine
+        // ============================================
+        function selectVisualization(mode) {
+            activeVisualizationMode = mode;
+            currentVisStepIndex = 0;
+            
+            const btnTens = document.getElementById('btn-vis-hundredsA');
+            const btnHundreds = document.getElementById('btn-vis-hundredsB');
+
+            if (mode === 'hundredsA') {
+                btnTens.className = "bg-teal-600 text-white font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide";
+                btnHundreds.className = "bg-slate-100 text-slate-450 font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide hover:bg-slate-200";
+            } else {
+                btnHundreds.className = "bg-teal-600 text-white font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide";
+                btnTens.className = "bg-slate-100 text-slate-455 font-bold text-[10px] px-3 py-1 rounded-lg uppercase tracking-wide hover:bg-slate-200";
+            }
+            renderVisualization();
+        }
+
+        function renderVisualization() {
+            const data = visualizerData[activeVisualizationMode];
+            const step = data.steps[currentVisStepIndex];
+
+            // Render typewriter porogapit block lines
+            const linesContainer = document.getElementById('porogapit-lines');
+            linesContainer.innerHTML = step.lines.map(line => `<div>${line.replace(/ /g, '&nbsp;')}</div>`).join('');
+
+            // Steps text updates
+            document.getElementById('vis-step-badge').textContent = `Langkah ${currentVisStepIndex + 1}`;
+            document.getElementById('vis-step-title').textContent = step.title;
+            document.getElementById('vis-step-desc').textContent = step.desc;
+
+            // Navigation status
+            document.getElementById('vis-prev-btn').disabled = currentVisStepIndex === 0;
+            document.getElementById('vis-next-btn').innerHTML = currentVisStepIndex === data.steps.length - 1 ? 
+                'Ulangi Simulasi <i class="fa-solid fa-rotate-left ml-1"></i>' : 
+                'Langkah Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>';
+        }
+
+        function nextVisStep() {
+            const data = visualizerData[activeVisualizationMode];
+            if (currentVisStepIndex < data.steps.length - 1) {
+                currentVisStepIndex++;
+                renderVisualization();
+                playQuizSound('correct');
+            } else {
+                currentVisStepIndex = 0;
+                renderVisualization();
+            }
+        }
+
+        function prevVisStep() {
+            if (currentVisStepIndex > 0) {
+                currentVisStepIndex--;
+                renderVisualization();
+            }
+        }
+
+        // Init Setup Run
+        buildSlideMenu();
+        buildBullets();
+        showSlide(1);
+
+        // Keyboard navigation bindings
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>

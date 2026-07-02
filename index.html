@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Juara Pembagian Bersusun - Badminton Math</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdfa; /* Light mint arena */
+            background-image: radial-gradient(#14b8a6 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-kids {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom slide transitions */
+        .slide-hidden {
+            display: none !important;
+        }
+        .slide-active {
+            display: flex !important;
+            animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+        }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.98) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0fdfa;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14b8a6;
+            border-radius: 10px;
+        }
+        .correct-card { background-color: #f0fdf4 !important; border-color: #22c55e !important; }
+        .wrong-card { background-color: #fef2f2 !important; border-color: #f43f5e !important; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
+
+    <!-- Header Panel -->
+    <header class="bg-teal-600 text-white p-3 sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 shadow-md border-b-4 border-teal-800">
+        <div class="flex items-center gap-2">
+            <span class="text-xl md:text-2xl animate-bounce"><i class="fa-solid fa-medal text-yellow-300"></i></span>
+            <div>
+                <h1 class="text-xs md:text-md font-bold font-kids tracking-wider leading-none">TURNAMEN SMASH RATUSAN</h1>
+                <span class="text-[9px] font-mono tracking-widest text-teal-100 uppercase">25 Misi Porogapit &bull; Kelas 3 SD</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="bg-yellow-400 border border-yellow-500 px-2.5 py-1 rounded-full text-[11px] md:text-xs font-bold font-kids text-teal-950 shadow-md">
+                🏸 Poin: <span id="user-score">0</span>
+            </div>
+            <button onclick="toggleSidebar()" class="lg:hidden bg-teal-700 text-teal-100 px-2.5 py-1.5 rounded-xl text-xs font-bold">
+                <i class="fa-solid fa-th-list mr-1"></i> Misi
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow flex relative overflow-hidden">
+        
+        <!-- Sidebar Map / Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:static lg:flex flex-col w-64 bg-white border-r border-teal-100 p-4 transition-transform duration-300 ease-in-out z-30 shadow-lg lg:shadow-none h-full">
+            <div class="flex items-center justify-between mb-4 lg:hidden">
+                <span class="font-bold text-teal-900 font-kids text-sm">Peta Lapangan Turnamen</span>
+                <button onclick="toggleSidebar()" class="text-teal-700 hover:text-teal-900"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <h3 class="text-[10px] uppercase tracking-wider font-semibold text-teal-600 mb-3 px-1 font-mono flex justify-between items-center">
+                <span>Daftar Misi Smash</span>
+                <span id="progress-text" class="text-teal-800 font-bold">0/25 Selesai</span>
+            </h3>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 rounded-full h-2 mb-4">
+                <div id="progress-bar" class="bg-teal-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Dynamic Question Grid -->
+            <div class="flex-grow overflow-y-auto pr-1">
+                <div class="grid grid-cols-5 gap-1.5" id="question-grid">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-slate-100 text-[10px] text-slate-400 font-mono text-center">
+                Badminton Math &copy; 2026
+            </div>
+        </aside>
+
+        <!-- Slide Presentation / Game Window -->
+        <section class="flex-grow flex flex-col items-center justify-center p-3 md:p-6 overflow-y-auto h-[calc(100vh-56px)] w-full">
+            <div id="deck-canvas" class="w-full max-w-2xl bg-white border-4 border-teal-400 rounded-3xl shadow-xl flex flex-col justify-between overflow-hidden relative min-h-[480px] md:min-h-[500px]">
+                
+                <!-- Confetti Canvas overlay -->
+                <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none z-40 w-full h-full"></canvas>
+
+                <!-- Dynamic Slide Loader -->
+                <div class="flex-grow flex flex-col p-4 md:p-6 justify-between relative overflow-y-auto" id="quiz-container">
+                    
+                    <!-- KUIS UTAMA VIEW -->
+                    <div class="slide-active flex-col justify-between flex-grow gap-4 min-h-0" id="quiz-view">
+                        <!-- Top Header info -->
+                        <div class="flex items-center justify-between border-b border-teal-100 pb-2">
+                            <span id="quiz-badge" class="bg-teal-600 text-white px-3 py-0.5 rounded-full text-xs font-mono font-bold">Misi 1 / 25</span>
+                            <span class="text-xs text-slate-400 font-bold font-mono">Tingkat: Ratusan (Porogapit)</span>
+                        </div>
+                        
+                        <!-- Question Card -->
+                        <div class="flex-grow flex flex-col justify-center min-h-0 py-2">
+                            <div id="quiz-card" class="bg-slate-50 border-2 border-slate-200 p-4 md:p-5 rounded-2xl text-center flex flex-col justify-between gap-3 min-h-0">
+                                
+                                <!-- Question text (No number prefixed) -->
+                                <h4 id="quiz-question" class="text-xs md:text-sm font-black text-slate-800 leading-relaxed font-kids">
+                                    Memuat Pertanyaan...
+                                </h4>
+                                
+                                <!-- Visual SVG -->
+                                <div id="quiz-svg-container" class="py-1 bg-white rounded-xl border border-dashed border-teal-100 max-h-[100px] min-h-[70px] flex items-center justify-center">
+                                    <!-- Dynamic SVG -->
+                                </div>
+
+                                <!-- Options or Essay container -->
+                                <div id="quiz-options-container" class="grid grid-cols-1 gap-1.5 max-h-[160px] overflow-y-auto pr-0.5">
+                                    <!-- Dynamic Options or Essay Inputs -->
+                                </div>
+
+                                <!-- Explanations box -->
+                                <div id="quiz-explanation-box" class="hidden p-2.5 bg-teal-50 border border-teal-200 rounded-xl text-[10px] md:text-[11px] text-teal-800 font-semibold leading-normal text-left font-mono">
+                                    <!-- Dynamic Explanation -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PODIUM VIEW -->
+                    <div class="slide-hidden flex-col h-full gap-4 text-center justify-center items-center py-6 flex-grow" id="podium-view">
+                        <div class="max-w-md mx-auto space-y-4 my-auto">
+                            <span class="text-6xl md:text-7xl animate-bounce block">🏆</span>
+                            <h2 class="text-2xl md:text-3xl font-black font-kids text-teal-800">Juara Turnamen Pembagian Bersusun!</h2>
+                            <p class="text-slate-600 text-xs leading-relaxed max-w-sm mx-auto">
+                                Luar biasa Kapten! Semua rintangan pembagian logistik badminton ratusan telah hancur lebur oleh lesatan *smash* cerdasmu!
+                            </p>
+                            <div class="bg-teal-50 p-4 rounded-2xl border-2 border-teal-400 inline-block w-full shadow-inner max-w-xs font-kids">
+                                <span class="text-xs uppercase font-bold text-teal-700 block font-mono">Total Akumulasi Skor</span>
+                                <span id="final-score-val" class="text-3xl font-black text-emerald-700 leading-none block mt-1">0 / 250 Poin</span>
+                            </div>
+                        </div>
+                        <button onclick="resetQuiz()" class="bg-gradient-to-tr from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs font-kids shadow-md transition-all">
+                            Tanding Ulang Turnamen 🔄
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Beautiful Bottom Navigation bar -->
+                <div id="quiz-navigation-bar" class="bg-slate-50 border-t border-teal-100 px-4 py-3 flex justify-between items-center z-10 select-none">
+                    <!-- Left Corner: Previous Button -->
+                    <button id="prev-quiz-btn" onclick="prevQuizQuestion()" class="bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 px-4 py-1.5 rounded-xl text-xs font-bold font-kids transition-all flex items-center gap-1.5 disabled:opacity-35 disabled:pointer-events-none">
+                        <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                    </button>
+                    
+                    <!-- Center: Progress Indicator -->
+                    <span id="progress-indicator" class="text-[10px] md:text-xs text-slate-500 font-mono font-bold">Soal 1 dari 25</span>
+                    
+                    <!-- Right Corner: Next Button (Hidden/Disabled until answered) -->
+                    <button id="next-quiz-btn" onclick="nextQuizQuestion()" class="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs font-kids transition-all shadow-md flex items-center gap-1.5 disabled:opacity-35 disabled:pointer-events-none">
+                        <span>Misi Selanjutnya</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 25 Questions Badminton Theme without prefix numbers
+        const questions = [
+            { question: "Ada 148 butir kok bulutangkis yang akan dimasukkan ke dalam 4 tabung secara sama rata. Berapa isi kok pada setiap tabung?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="20" cy="50" r="10" fill="#0d9488" fill-opacity="0.3" stroke="#0d9488" stroke-width="2"/><circle cx="40" cy="50" r="10" fill="#0d9488" fill-opacity="0.3" stroke="#0d9488" stroke-width="2"/><circle cx="60" cy="50" r="10" fill="#0d9488" fill-opacity="0.3" stroke="#0d9488" stroke-width="2"/><circle cx="80" cy="50" r="10" fill="#0d9488" fill-opacity="0.3" stroke="#0d9488" stroke-width="2"/><text x="50" y="85" fill="#0f172a" font-size="10" font-weight="extrabold" text-anchor="middle">Total: 148 Kok</text></svg>`, type: "pg", options: ["35 kok", "37 kok", "39 kok"], answer: 1, exp: "Taktik Porogapit: 148 dibagi 4 = 37 kok per tabung." },
+            { question: "Klub badminton memiliki 246 buah raket cadangan. Raket-raket tersebut disusun rapi ke dalam 3 lemari gantung. Berapa isi raket pada setiap lemari?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="20" y="20" width="60" height="60" fill="#3b82f6" fill-opacity="0.1" stroke="#2563eb" stroke-width="3"/><line x1="40" y1="20" x2="40" y2="80" stroke="#2563eb" stroke-width="2"/><line x1="60" y1="20" x2="60" y2="80" stroke="#2563eb" stroke-width="2"/><text x="50" y="90" fill="#0f172a" font-size="9" font-weight="extrabold" text-anchor="middle">246 Raket</text></svg>`, type: "pg", options: ["72 raket", "82 raket", "92 raket"], answer: 1, exp: "Taktik Porogapit: 246 dibagi 3 = 82 raket per lemari." },
+            { question: "Sebanyak 126 gulung karet pegangan (grip) raket bulutangkis didistribusikan rata kepada 6 atlet junior pelatnas. Berapa gulungan grip yang didapatkan setiap atlet?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="20" cy="35" r="8" fill="#ca8a04"/><circle cx="50" cy="35" r="8" fill="#ca8a04"/><circle cx="80" cy="35" r="8" fill="#ca8a04"/><circle cx="20" cy="65" r="8" fill="#ca8a04"/><circle cx="50" cy="65" r="8" fill="#ca8a04"/><circle cx="80" cy="65" r="8" fill="#ca8a04"/></svg>`, type: "pg", options: ["21 grip", "23 grip", "25 grip"], answer: 0, exp: "Taktik Porogapit: 126 dibagi 6 = 21 gulungan grip." },
+            { question: "Di sebuah turnamen ganda putra, terdapat 315 meter gulungan senar raket. Senar ini akan dipotong rata menjadi 9 bagian. Berapa meter panjang setiap potongan senar?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><path d="M10,50 Q30,20 50,50 T90,50" fill="none" stroke="#db2777" stroke-width="3"/><text x="50" y="85" fill="#0f172a" font-size="10" font-weight="extrabold" text-anchor="middle">315 Meter</text></svg>`, type: "pg", options: ["33 meter", "35 meter", "37 meter"], answer: 1, exp: "Taktik Porogapit: 315 dibagi 9 = 35 meter senar." },
+            { question: "Ada 165 botol air mineral energi penambah stamin yang akan dibagi merata ke dalam 5 boks pendingin lapangan. Berapa isi botol pada setiap boks?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="15" y="25" width="70" height="50" fill="#f97316" fill-opacity="0.1" stroke="#ea580c" stroke-width="3"/><text x="50" y="90" fill="#0f172a" font-size="10" font-weight="extrabold" text-anchor="middle">165 Botol</text></svg>`, type: "pg", options: ["31 botol", "33 botol", "35 botol"], answer: 1, exp: "Taktik Porogapit: 165 dibagi 5 = 33 botol per boks." },
+            { question: "Sebanyak 104 pasang sepatu bulutangkis didistribusikan merata ke 8 sekolah bulutangkis daerah. Berapa pasang sepatu yang didapat tiap sekolah?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><path d="M20,60 L40,30 L60,30 L80,60 Z" fill="#06b6d4" fill-opacity="0.1" stroke="#0891b2" stroke-width="3"/></svg>`, type: "pg", options: ["12 pasang", "13 pasang", "14 pasang"], answer: 1, exp: "Taktik Porogapit: 104 dibagi 8 = 13 pasang sepatu." },
+            { question: "Dalam latihan fisik lari, seorang atlet menempuh jarak total 245 meter dengan berlari mengitari lapangan sebanyak 5 kali putaran penuh. Berapa meter keliling satu putaran lapangan badminton?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="15" y="25" width="70" height="50" fill="none" stroke="#22c55e" stroke-dasharray="4" stroke-width="3"/></svg>`, type: "pg", options: ["45 meter", "49 meter", "53 meter"], answer: 1, exp: "Taktik Porogapit: 245 dibagi 5 = 49 meter per putaran." },
+            { question: "Sebanyak 144 buah kaus latihan badminton dipaketkan merata ke dalam 6 kardus pengiriman logistik tim nasional. Berapa buah kaus dalam tiap kardus?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="25" y="25" width="50" height="50" fill="#3b82f6" fill-opacity="0.1" stroke="#1d4ed8" stroke-width="3"/></svg>`, type: "pg", options: ["22 kaus", "24 kaus", "26 kaus"], answer: 1, exp: "Taktik Porogapit Ratusan: 144 dibagi 6 = 24 buah kaus." },
+            { question: "Panitia turnamen menyediakan 180 butir kok bulutangkis untuk dibagikan secara merata kepada 9 lapangan tanding utama. Berapa butir kok cadangan yang dialokasikan per lapangan?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="50" cy="50" r="30" fill="none" stroke="#eab308" stroke-width="4" stroke-dasharray="6"/></svg>`, type: "pg", options: ["18 kok", "20 kok", "22 kok"], answer: 1, exp: "Membagi ratusan: 180 dibagi 9 = 20 butir kok per lapangan." },
+            { question: "Di sebuah gudang penyimpanan klub, terdapat 224 buah net bulutangkis yang akan dibagi merata ke dalam 7 wilayah latihan kabupaten. Berapa buah net yang disuplai per wilayah?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><line x1="10" y1="50" x2="90" y2="50" stroke="#f43f5e" stroke-width="4" stroke-dasharray="4"/></svg>`, type: "pg", options: ["30 net", "32 net", "34 net"], answer: 1, exp: "Taktik Porogapit Ratusan: 224 dibagi 7 = 32 buah net." },
+            { question: "Sebanyak 270 tiket tribun semifinal badminton dibagikan merata ke 6 sekolah bulutangkis anak berprestasi. Berapa lembar tiket yang didapatkan tiap sekolah?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="20" y="30" width="60" height="40" fill="#a855f7" fill-opacity="0.1" stroke="#7e22ce" stroke-width="3"/></svg>`, type: "pg", options: ["42 tiket", "45 tiket", "48 tiket"], answer: 1, exp: "Taktik Porogapit Ratusan: 270 dibagi 6 = 45 lembar tiket." },
+            { question: "Sebuah perkumpulan olahraga memiliki 315 buah piagam juara. Piagam tersebut dipajang seimbang ke dalam 5 lemari kaca. Berapa isi piagam pada setiap lemari?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><polygon points="50,15 90,85 10,85" fill="#14b8a6" fill-opacity="0.1" stroke="#0d9488" stroke-width="3"/></svg>`, type: "pg", options: ["63 piagam", "65 piagam", "67 piagam"], answer: 0, exp: "Taktik Porogapit: 315 dibagi 5 = 63 piagam." },
+            
+            // ESSAY ONES (Isian Angka Saja)
+            { question: "Sebanyak 128 butir shuttlecock merk nasional dikirim untuk dibagikan secara merata ke 4 arena latihan utama. Berapa kok yang didapat masing-masing arena? (Isi angka saja!)", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="35" cy="35" r="10" fill="#0d9488" fill-opacity="0.2"/><circle cx="65" cy="35" r="10" fill="#0d9488" fill-opacity="0.2"/><circle cx="35" cy="65" r="10" fill="#0d9488" fill-opacity="0.2"/><circle cx="65" cy="65" r="10" fill="#0d9488" fill-opacity="0.2"/></svg>`, type: "essay", answer: "32", exp: "Porogapit Ratusan: 128 dibagi 4 = 32 kok per arena." },
+            { question: "Untuk latihan kelincahan kaki, atlet melakukan lompat tali sebanyak 165 kali lompatan dalam 3 set latihan yang durasinya sama. Berapa lompatan per set?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><path d="M15,80 Q50,10 85,80" fill="none" stroke="#10b981" stroke-width="4"/></svg>`, type: "essay", answer: "55", exp: "Porogapit Ratusan: 165 dibagi 3 = 55 lompatan per set." },
+            { question: "Total berat seluruh paket pengiriman raket baru klub adalah 315 gram. Jika diisi oleh 9 buah raket dengan jenis dan berat yang sama, berapa gram berat satu raket?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><line x1="30" y1="20" x2="70" y2="80" stroke="#f59e0b" stroke-width="5"/></svg>`, type: "essay", answer: "35", exp: "Porogapit Ratusan: 315 dibagi 9 = 35 gram berat satu raket." },
+            { question: "Untuk merenovasi lapangan badminton, tim membutuhkan 240 bilah garis lapangan putih. Jika garis-garis tersebut dipaketkan rata ke 8 kardus kemasan, berapa isi bilah per kardus?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="20" y="20" width="60" height="60" fill="none" stroke="#1e293b" stroke-width="4"/></svg>`, type: "essay", answer: "30", exp: "Porogapit Ratusan: 240 dibagi 8 = 30 bilah garis lapangan." },
+            { question: "Sebanyak 112 buah botol air minum dibagikan secara merata kepada 4 tim ganda pelatnas bulutangkis. Berapa botol yang diterima oleh setiap tim?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="35" y="20" width="30" height="60" rx="5" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/></svg>`, type: "essay", answer: "28", exp: "Porogapit Ratusan: 112 dibagi 4 = 28 botol air minum." },
+            { question: "Tim logistik kejuaraan badminton menyediakan 360 botol semprotan pendingin otot pereda cedera untuk dialokasikan rata di 6 pos medis lapangan. Berapa isi semprotan per pos medis?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="30" y="20" width="40" height="60" fill="#a855f7" fill-opacity="0.1" stroke="#7e22ce" stroke-width="2"/><line x1="30" y1="35" x2="70" y2="35" stroke="#7e22ce" stroke-width="2"/></svg>`, type: "essay", answer: "60", exp: "Porogapit Ratusan: 360 dibagi 6 = 60 botol per pos medis." },
+            { question: "Sebuah gulungan senar raket badminton sepanjang 480 meter dipotong sama rata untuk 8 buah raket pro atlet pelatnas. Berapa meter jatah senar yang didapat masing-masing raket?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="50" cy="50" r="30" fill="none" stroke="#22c55e" stroke-width="4"/></svg>`, type: "essay", answer: "60", exp: "Porogapit Ratusan: 480 dibagi 8 = 60 meter senar." },
+            { question: "Di turnamen junior kabupaten, terdapat 196 atlet bulutangkis terdaftar. Jika para pemain tersebut dibagi merata ke dalam 4 grup tanding utama, berapa atlet isi tiap grup?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="20" y="20" width="60" height="60" fill="none" stroke="#f43f5e" stroke-width="3"/></svg>`, type: "essay", answer: "49", exp: "Porogapit Ratusan: 196 dibagi 4 = 49 atlet per grup." },
+            { question: "Sebanyak 450 buah brosur promosi kompetisi piala merdeka badminton dibagikan merata ke 5 sekolah dasar sekitar daerah. Berapa brosur yang diterima tiap sekolah?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="25" y="20" width="50" height="60" fill="#38bdf8" fill-opacity="0.1" stroke="#0284c7" stroke-width="2"/></svg>`, type: "essay", answer: "90", exp: "Porogapit Ratusan: 450 dibagi 5 = 90 brosur promosi." },
+            { question: "Panitia turnamen menyediakan 315 buah kartu tanda pengenal panitia yang akan dibagi rata ke 7 divisi divisi kerja kepanitiaan. Berapa kartu tanda pengenal per divisi?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="25" y="30" width="50" height="40" fill="#facc15" fill-opacity="0.1" stroke="#ca8a04" stroke-width="2"/></svg>`, type: "essay", answer: "45", exp: "Porogapit Ratusan: 315 dibagi 7 = 45 buah kartu panitia." },
+            { question: "Sebanyak 720 butir shuttlecock bulutangkis baru disalurkan merata ke dalam 9 boks wadah latihan atlet ganda campuran pelatnas. Berapa isi kok dalam tiap boks wadah?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="50" cy="50" r="30" fill="#14b8a6" fill-opacity="0.2" stroke="#0d9488" stroke-width="4" /></svg>`, type: "essay", answer: "80", exp: "Porogapit Ratusan: 720 dibagi 9 = 80 butir shuttlecock." },
+            { question: "Pada pertandingan pemanasan, wasit membagikan 168 kaleng suplemen vitamin rata kepada 3 tim bulutangkis kontestan. Berapa kaleng didapat tiap tim?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><circle cx="50" cy="50" r="25" fill="#a855f7" fill-opacity="0.2" stroke="#a855f7" stroke-width="3"/></svg>`, type: "essay", answer: "56", exp: "Porogapit Ratusan: 168 dibagi 3 = 56 kaleng suplemen." },
+            { question: "Ada 215 piagam kertas sertifikat keikutsertaan turnamen yang dibagi rata ke 5 klub junior setempat. Berapa piagam yang diperoleh tiap klub?", svg: `<svg viewBox="0 0 100 100" class="h-16 w-auto"><rect x="25" y="25" width="50" height="50" fill="#10b981" fill-opacity="0.1" stroke="#10b981" stroke-width="3"/></svg>`, type: "essay", answer: "43", exp: "Porogapit Ratusan: 215 dibagi 5 = 43 lembar piagam." }
+        ];
+
+        let quizIndex = 0;
+        let answeredQuestions = Array(25).fill(false);
+        let userAnswers = Array(25).fill(null);
+        let score = 0;
+
+        // Sound Synthesis (Web Audio API)
+        function playQuizSound(type) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(698.46, audioCtx.currentTime + 0.08); // F5
+                    osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.16); // A5
+                    osc.frequency.setValueAtTime(1174.66, audioCtx.currentTime + 0.24); // D6
+                } else {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+                }
+                
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (e) {
+                console.log("Audio contexts not loaded yet.");
+            }
+        }
+
+        // Build Sidebar Mission Grid
+        function buildQuestionGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = "";
+            for (let i = 0; i < 25; i++) {
+                const isAnswered = answeredQuestions[i];
+                let btnClass = "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200";
+                
+                if (isAnswered) {
+                    const q = questions[i];
+                    const savedAns = userAnswers[i];
+                    const isCorrect = q.type === 'essay' ? (savedAns === q.answer) : (parseInt(savedAns) === q.answer);
+                    btnClass = isCorrect ? "bg-emerald-500 text-white border-emerald-600" : "bg-rose-500 text-white border-rose-600";
+                } else if (i === quizIndex) {
+                    btnClass = "bg-teal-600 text-white ring-4 ring-teal-200 font-bold scale-105 border-teal-700";
+                }
+
+                grid.innerHTML += `
+                    <button onclick="goToQuestion(${i})" class="h-9 w-full rounded-lg text-xs font-bold transition-all flex items-center justify-center ${btnClass}">
+                        ${i + 1}
+                    </button>
+                `;
+            }
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const answeredCount = answeredQuestions.filter(x => x).length;
+            const percentage = (answeredCount / 25) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = `${answeredCount}/25 Selesai`;
+        }
+
+        function renderQuizCard() {
+            const q = questions[quizIndex];
+            
+            // Adjust layouts & hide visual elements conditionally
+            document.getElementById('quiz-view').classList.remove('slide-hidden');
+            document.getElementById('quiz-view').classList.add('slide-active');
+            document.getElementById('podium-view').classList.add('slide-hidden');
+            document.getElementById('podium-view').classList.remove('slide-active');
+
+            document.getElementById('quiz-badge').textContent = `Misi ${quizIndex + 1} / 25`;
+            document.getElementById('quiz-question').textContent = q.question;
+            document.getElementById('quiz-svg-container').innerHTML = q.svg || '';
+            document.getElementById('quiz-explanation-box').classList.add('hidden');
+            
+            // Re-render Bottom Navigation bar states
+            const prevBtn = document.getElementById('prev-quiz-btn');
+            const nextBtn = document.getElementById('next-quiz-btn');
+            const navBar = document.getElementById('quiz-navigation-bar');
+
+            // Show navigation bar
+            navBar.classList.remove('hidden');
+
+            // Manage Previous Button state
+            if (quizIndex > 0) {
+                prevBtn.disabled = false;
+            } else {
+                prevBtn.disabled = true;
+            }
+
+            const optContainer = document.getElementById('quiz-options-container');
+            optContainer.innerHTML = '';
+
+            const isAnswered = answeredQuestions[quizIndex];
+            const savedAns = userAnswers[quizIndex];
+
+            if (q.type === 'essay') {
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex gap-2 w-full max-w-sm mx-auto py-1";
+                wrapper.innerHTML = `
+                    <input type="number" id="essay-input" class="bg-white border-2 border-slate-200 rounded-xl px-4 py-1.5 w-full text-center font-bold text-teal-600 focus:border-teal-500 outline-none font-mono text-sm" placeholder="Ketik jawaban angka..." ${isAnswered ? 'disabled' : ''}>
+                    <button onclick="checkEssayAnswer()" id="essay-check-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-1.5 rounded-xl text-xs font-kids transition-colors ${isAnswered ? 'hidden' : ''}">SMASH!</button>
+                `;
+                optContainer.appendChild(wrapper);
+                if (isAnswered) {
+                    document.getElementById('essay-input').value = savedAns || '';
+                    revealExplanation(savedAns === q.answer);
+                } else {
+                    nextBtn.disabled = true;
+                }
+            } else {
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.id = `opt-btn-${idx}`;
+                    btn.className = "w-full text-left p-2.5 rounded-xl border border-slate-200 font-semibold text-xs transition-all duration-150 hover:bg-slate-100 text-slate-700";
+                    btn.textContent = `${String.fromCharCode(65 + idx)}. ${opt}`;
+                    btn.onclick = () => checkPGAnswer(idx);
+                    optContainer.appendChild(btn);
+
+                    if (isAnswered) {
+                        btn.disabled = true;
+                        const correctIdx = parseInt(q.answer);
+                        const selectedIdx = parseInt(savedAns);
+                        if (correctIdx === idx) {
+                            btn.className = "w-full text-left p-2.5 rounded-xl border border-emerald-500 font-bold text-xs bg-emerald-50 text-emerald-700";
+                        } else if (selectedIdx === idx) {
+                            btn.className = "w-full text-left p-2.5 rounded-xl border border-rose-500 font-bold text-xs bg-rose-50 text-rose-700";
+                        }
+                    }
+                });
+
+                if (isAnswered) {
+                    revealExplanation(parseInt(savedAns) === q.answer);
+                } else {
+                    nextBtn.disabled = true;
+                }
+            }
+
+            // Change Next Button text if it's the last question
+            if (quizIndex === 24) {
+                nextBtn.innerHTML = `<span>Selesai</span> <i class="fa-solid fa-flag-checkered ml-1"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Misi Selanjutnya</span> <i class="fa-solid fa-arrow-right ml-1"></i>`;
+            }
+
+            document.getElementById('progress-indicator').textContent = `Soal ${quizIndex + 1} dari 25`;
+            buildQuestionGrid();
+        }
+
+        function checkPGAnswer(idx) {
+            const q = questions[quizIndex];
+            if (answeredQuestions[quizIndex]) return;
+
+            const isCorrect = idx === q.answer;
+            answeredQuestions[quizIndex] = true;
+            userAnswers[quizIndex] = idx;
+
+            if (isCorrect) {
+                updateScore(10);
+                playQuizSound('correct');
+                triggerConfetti();
+            } else {
+                playQuizSound('wrong');
+            }
+
+            renderQuizCard();
+        }
+
+        function checkEssayAnswer() {
+            const q = questions[quizIndex];
+            const inp = document.getElementById('essay-input');
+            const val = inp.value.trim();
+            if (val === '') return;
+
+            const isCorrect = val === q.answer;
+            answeredQuestions[quizIndex] = true;
+            userAnswers[quizIndex] = val;
+
+            if (isCorrect) {
+                updateScore(10);
+                playQuizSound('correct');
+                triggerConfetti();
+            } else {
+                playQuizSound('wrong');
+            }
+
+            renderQuizCard();
+        }
+
+        function revealExplanation(isCorrect) {
+            const q = questions[quizIndex];
+            const expBox = document.getElementById('quiz-explanation-box');
+            expBox.innerHTML = `<strong>${isCorrect ? '🏸 SMASH AKURAT! Skor masuk!' : '❌ Raket meleset, kok jatuh keluar lapangan!'}</strong><br>${q.exp}`;
+            expBox.classList.remove('hidden');
+            
+            // Enable the Next button now that they've answered
+            document.getElementById('next-quiz-btn').disabled = false;
+            
+            // Smoothly auto scroll down the inner container
+            setTimeout(() => {
+                const container = document.getElementById('quiz-container');
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+
+        function nextQuizQuestion() {
+            const card = document.getElementById('quiz-card');
+            card.classList.remove('correct-card', 'wrong-card');
+
+            if (quizIndex < 24) {
+                quizIndex++;
+                renderQuizCard();
+                document.getElementById('quiz-container').scrollTop = 0;
+            } else {
+                // Show Podium
+                document.getElementById('quiz-view').classList.add('slide-hidden');
+                document.getElementById('quiz-view').classList.remove('slide-active');
+                document.getElementById('podium-view').classList.remove('slide-hidden');
+                document.getElementById('podium-view').classList.add('slide-active');
+                
+                // Hide bottom navigation bar on podium slide
+                document.getElementById('quiz-navigation-bar').classList.add('hidden');
+                
+                document.getElementById('final-score-val').textContent = `${score} / 250 Poin`;
+                triggerConfetti();
+            }
+        }
+
+        function prevQuizQuestion() {
+            if (quizIndex > 0) {
+                quizIndex--;
+                renderQuizCard();
+                document.getElementById('quiz-container').scrollTop = 0;
+            }
+        }
+
+        function goToQuestion(index) {
+            quizIndex = index;
+            renderQuizCard();
+            document.getElementById('quiz-container').scrollTop = 0;
+            if (window.innerWidth < 1024) {
+                toggleSidebar();
+            }
+        }
+
+        // Add visual indicator of score
+        function updateScore(amount) {
+            score += amount;
+            document.getElementById('user-score').textContent = score;
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function resetQuiz() {
+            score = 0;
+            quizIndex = 0;
+            answeredQuestions.fill(false);
+            userAnswers.fill(null);
+            document.getElementById('user-score').textContent = "0";
+            renderQuizCard();
+        }
+
+        // ============================================
+        // Confetti Particle Engine (Native Canvas)
+        // ============================================
+        let canvas, ctx, particles = [];
+        let animationId = null;
+
+        function setupConfetti() {
+            canvas = document.getElementById('confetti-canvas');
+            ctx = canvas.getContext('2d');
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+        }
+
+        function resizeCanvas() {
+            if (canvas) {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -50 - 10;
+                this.size = Math.random() * 5 + 3;
+                this.color = ['#fbbf24', '#22c55e', '#3b82f6', '#f43f5e', '#a855f7'][Math.floor(Math.random() * 5)];
+                this.vY = Math.random() * 4 + 3;
+                this.vX = Math.random() * 2 - 1;
+            }
+            update() {
+                this.y += this.vY;
+                this.x += this.vX;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        function triggerConfetti() {
+            resizeCanvas();
+            particles = [];
+            for (let i = 0; i < 75; i++) particles.push(new Particle());
+            if (animationId) cancelAnimationFrame(animationId);
+            drawConfetti();
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+                if (p.y < canvas.height) active = true;
+            });
+            if (active) animationId = requestAnimationFrame(drawConfetti);
+        }
+
+        // Initialize App
+        renderQuizCard();
+        setupConfetti();
+
+        // Keyboard navigation bindings
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && answeredQuestions[quizIndex]) {
+                nextQuizQuestion();
+            }
+            if (e.key === 'ArrowLeft') {
+                prevQuizQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
